@@ -347,6 +347,12 @@ class _GoogleMapState extends State<GoogleMap> {
       return;
     }
     final GoogleMapController controller = await _controller.future;
+    if(!controller._googleMapState.mounted){
+      // sanity check not to call anything when state is not mounted anymore.
+      // it could happen due to race condition while context switching between
+      // didUpdateWidget and dispose when both called "at the same time"
+      return;
+    }
     // ignore: unawaited_futures
     controller._updateMapOptions(updates);
     _googleMapOptions = newOptions;
@@ -354,6 +360,12 @@ class _GoogleMapState extends State<GoogleMap> {
 
   void _updateMarkers() async {
     final GoogleMapController controller = await _controller.future;
+    if(!controller._googleMapState.mounted){
+      // sanity check not to call anything when state is not mounted anymore.
+      // it could happen due to race condition while context switching between
+      // didUpdateWidget and dispose when both called "at the same time"
+      return;
+    }
     // ignore: unawaited_futures
     controller._updateMarkers(
         MarkerUpdates.from(_markers.values.toSet(), widget.markers));
@@ -362,6 +374,12 @@ class _GoogleMapState extends State<GoogleMap> {
 
   void _updatePolygons() async {
     final GoogleMapController controller = await _controller.future;
+    if(!controller._googleMapState.mounted){
+      // sanity check not to call anything when state is not mounted anymore.
+      // it could happen due to race condition while context switching between
+      // didUpdateWidget and dispose when both called "at the same time"
+      return;
+    }
     // ignore: unawaited_futures
     controller._updatePolygons(
         PolygonUpdates.from(_polygons.values.toSet(), widget.polygons));
@@ -370,6 +388,12 @@ class _GoogleMapState extends State<GoogleMap> {
 
   void _updatePolylines() async {
     final GoogleMapController controller = await _controller.future;
+    if(!controller._googleMapState.mounted){
+      // sanity check not to call anything when state is not mounted anymore.
+      // it could happen due to race condition while context switching between
+      // didUpdateWidget and dispose when both called "at the same time"
+      return;
+    }
     // ignore: unawaited_futures
     controller._updatePolylines(
         PolylineUpdates.from(_polylines.values.toSet(), widget.polylines));
@@ -378,6 +402,12 @@ class _GoogleMapState extends State<GoogleMap> {
 
   void _updateCircles() async {
     final GoogleMapController controller = await _controller.future;
+    if(!controller._googleMapState.mounted){
+      // sanity check not to call anything when state is not mounted anymore.
+      // it could happen due to race condition while context switching between
+      // didUpdateWidget and dispose when both called "at the same time"
+      return;
+    }
     // ignore: unawaited_futures
     controller._updateCircles(
         CircleUpdates.from(_circles.values.toSet(), widget.circles));
@@ -386,6 +416,12 @@ class _GoogleMapState extends State<GoogleMap> {
 
   void _updateTileOverlays() async {
     final GoogleMapController controller = await _controller.future;
+    if(!controller._googleMapState.mounted){
+      // sanity check not to call anything when state is not mounted anymore.
+      // it could happen due to race condition while context switching between
+      // didUpdateWidget and dispose when both called "at the same time"
+      return;
+    }
     // ignore: unawaited_futures
     controller._updateTileOverlays(widget.tileOverlays);
   }
