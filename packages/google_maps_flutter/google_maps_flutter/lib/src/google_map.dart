@@ -347,81 +347,69 @@ class _GoogleMapState extends State<GoogleMap> {
       return;
     }
     final GoogleMapController controller = await _controller.future;
-    if(!controller._googleMapState.mounted){
-      // sanity check not to call anything when state is not mounted anymore.
-      // it could happen due to race condition while context switching between
-      // didUpdateWidget and dispose when both called "at the same time"
-      return;
-    }
     // ignore: unawaited_futures
     controller._updateMapOptions(updates);
     _googleMapOptions = newOptions;
   }
 
   void _updateMarkers() async {
-    final GoogleMapController controller = await _controller.future;
-    if(!controller._googleMapState.mounted){
-      // sanity check not to call anything when state is not mounted anymore.
-      // it could happen due to race condition while context switching between
-      // didUpdateWidget and dispose when both called "at the same time"
+    final _markerUpdates = MarkerUpdates.from(_markers.values.toSet(), widget.markers);
+
+    if (_markerUpdates.markerIdsToRemove.isEmpty &&
+        _markerUpdates.markersToAdd.isEmpty &&
+        _markerUpdates.markersToChange.isEmpty) {
       return;
     }
+    final GoogleMapController controller = await _controller.future;
     // ignore: unawaited_futures
-    controller._updateMarkers(
-        MarkerUpdates.from(_markers.values.toSet(), widget.markers));
+    controller._updateMarkers(_markerUpdates);
     _markers = keyByMarkerId(widget.markers);
   }
 
   void _updatePolygons() async {
-    final GoogleMapController controller = await _controller.future;
-    if(!controller._googleMapState.mounted){
-      // sanity check not to call anything when state is not mounted anymore.
-      // it could happen due to race condition while context switching between
-      // didUpdateWidget and dispose when both called "at the same time"
+    final _polygonUpdates = PolygonUpdates.from(_polygons.values.toSet(), widget.polygons);
+
+    if (_polygonUpdates.polygonIdsToRemove.isEmpty &&
+        _polygonUpdates.polygonsToAdd.isEmpty &&
+        _polygonUpdates.polygonsToChange.isEmpty) {
       return;
     }
+    final GoogleMapController controller = await _controller.future;
     // ignore: unawaited_futures
-    controller._updatePolygons(
-        PolygonUpdates.from(_polygons.values.toSet(), widget.polygons));
+    controller._updatePolygons(_polygonUpdates);
     _polygons = keyByPolygonId(widget.polygons);
   }
 
   void _updatePolylines() async {
-    final GoogleMapController controller = await _controller.future;
-    if(!controller._googleMapState.mounted){
-      // sanity check not to call anything when state is not mounted anymore.
-      // it could happen due to race condition while context switching between
-      // didUpdateWidget and dispose when both called "at the same time"
+    final _polylineUpdates = PolylineUpdates.from(_polylines.values.toSet(), widget.polylines);
+
+    if (_polylineUpdates.polylineIdsToRemove.isEmpty &&
+        _polylineUpdates.polylinesToAdd.isEmpty &&
+        _polylineUpdates.polylinesToChange.isEmpty) {
       return;
     }
+    final GoogleMapController controller = await _controller.future;
     // ignore: unawaited_futures
-    controller._updatePolylines(
-        PolylineUpdates.from(_polylines.values.toSet(), widget.polylines));
+    controller._updatePolylines(_polylineUpdates);
     _polylines = keyByPolylineId(widget.polylines);
   }
 
   void _updateCircles() async {
-    final GoogleMapController controller = await _controller.future;
-    if(!controller._googleMapState.mounted){
-      // sanity check not to call anything when state is not mounted anymore.
-      // it could happen due to race condition while context switching between
-      // didUpdateWidget and dispose when both called "at the same time"
+    final _circleUpdates = CircleUpdates.from(_circles.values.toSet(), widget.circles);
+
+    if (_circleUpdates.circleIdsToRemove.isEmpty &&
+        _circleUpdates.circlesToAdd.isEmpty &&
+        _circleUpdates.circlesToChange.isEmpty) {
       return;
     }
+    final GoogleMapController controller = await _controller.future;
     // ignore: unawaited_futures
-    controller._updateCircles(
-        CircleUpdates.from(_circles.values.toSet(), widget.circles));
+    controller._updateCircles(_circleUpdates);
     _circles = keyByCircleId(widget.circles);
   }
 
   void _updateTileOverlays() async {
     final GoogleMapController controller = await _controller.future;
-    if(!controller._googleMapState.mounted){
-      // sanity check not to call anything when state is not mounted anymore.
-      // it could happen due to race condition while context switching between
-      // didUpdateWidget and dispose when both called "at the same time"
-      return;
-    }
     // ignore: unawaited_futures
     controller._updateTileOverlays(widget.tileOverlays);
   }
@@ -644,7 +632,15 @@ class _GoogleMapOptions {
     final Map<String, dynamic> prevOptionsMap = toMap();
 
     return newOptions.toMap()
-      ..removeWhere(
-          (String key, dynamic value) => prevOptionsMap[key] == value);
+      ..removeWhere((String key, dynamic value) {
+        if (value is List) {
+          return listEquals(prevOptionsMap[key], value);
+        }
+        return prevOptionsMap[key] == value;
+      });
+
+    // return newOptions.toMap()
+    //   ..removeWhere(
+    //       (String key, dynamic value) => prevOptionsMap[key] == value);
   }
 }
